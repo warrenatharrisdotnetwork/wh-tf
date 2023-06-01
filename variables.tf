@@ -45,7 +45,7 @@ variable "subnet_bits" {
 variable "az_zones" {
   type = list
   description = "AZs"
-
+  default = [ "us-east-1a", "us-east-1b" ]
 
 }
 

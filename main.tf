@@ -7,13 +7,10 @@ resource "aws_vpc" "warren_vpc_1" {
     tags = {
       Name = "warren"
       bird = "word"
-
     }
-  
 }
-
 resource "aws_internet_gateway" "ig1" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.warren_vpc_1.id
 
 }
 
@@ -30,7 +27,8 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   # will create 2 subnets, index = 0 , index = 1,
   count = var.private_subnet_count
-  availability_zone = "us-east-1a"
+  #availability_zone = "us-east-1a"
+  availability_zone = element(var.az_zones, count.index)
   # 8 bits added to subnet mask, /16 -> /24, increment by subnet mask incriment, 10.0.0.0 > 10.0.0.
   cidr_block = cidrsubnet(var.vpc_cidr, var.subnet_bits,count.index + var.public_subnet_count)
   vpc_id = aws_vpc.warren_vpc_1.id
@@ -38,7 +36,7 @@ resource "aws_subnet" "private" {
 
 
 resource "aws_route_table" "public-rt1" {
-  vpc_id = aws_vpc.warren_vpc_1
+  vpc_id = aws_vpc.warren_vpc_1.id
   tags = {
     bird = "word"
     Name = "warren-private-rt"
@@ -46,18 +44,21 @@ resource "aws_route_table" "public-rt1" {
 }
 
 resource "aws_route" "public-rt-1" {
-  route_table_id = aws_route_table.public-rt1
+  route_table_id = aws_route_table.public-rt1.id
   # only default route
-  destinationdestination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = "0.0.0.0/0"
   gateway_id = aws_internet_gateway.ig1.id
-  
+    
 }
 
 resource "aws_route_table_association" "rt-public" {
   count = var.public_subnet_count
   # associate multiple subnets with the route table above for public subnets
   subnet_id = aws_subnet.public[count.index].id
- 
   route_table_id = aws_route_table.public-rt1.id
+  
 }
 
+resource "aws_eip" "main" {
+#  domain = "vpc"
+}
