@@ -20,11 +20,13 @@ resource "aws_internet_gateway" "ig1" {
 resource "aws_subnet" "public1" {
   availability_zone = "us-east-1a"
   cidr_block = "10.0.0.0/24"
+  vpc_id = aws_vpc.warren_vpc_1.id
 }
 
 resource "aws_subnet" "public2" {
   availability_zone = "us-east-1b"
   cidr_block = "10.0.1.0/24"
+  vpc_id = aws_vpc.warren_vpc_1.id
 }
 
 resource "aws_subnet" "private1" {
