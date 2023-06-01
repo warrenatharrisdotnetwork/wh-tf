@@ -18,8 +18,12 @@ resource "aws_internet_gateway" "ig1" {
 }
 
 resource "aws_subnet" "public1" {
+  count = 2
   availability_zone = "us-east-1a"
-  cidr_block = "10.0.0.0/24"
+  # 8 bits added to subnet mask, /16 -> /24, increment by subnet mask incriment, 10.0.0.0 > 10.0.0.
+  cidr_block = cidrsubnet(var.vpc_cidr, var.subnet_bits,0)
+  map_public_ip_on_launch = true
+  #cidr_block = "10.0.0.0/24"
   vpc_id = aws_vpc.warren_vpc_1.id
 }
 
